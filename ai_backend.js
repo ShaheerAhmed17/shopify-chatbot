@@ -9,8 +9,8 @@ app.use(bodyParser.json());
 // --- Serve static frontend files ---
 app.use(express.static(path.join(__dirname, 'public')));
 
-const SHOPIFY_BACKEND = 'http://localhost:3000';  // Shopify backend
-const PHI3_BACKEND = 'http://localhost:8000';     // Phi3 AI backend
+const SHOPIFY_BACKEND = process.env.SHOPIFY_BACKEND_URL || 'http://localhost:3000';  // Shopify backend
+const PHI3_BACKEND = process.env.PHI3_BACKEND_URL || 'http://localhost:8000';    // Phi3 AI backend
 
 // --- Helper: extract first JSON object from Phi3 response ---
 function extractJSON(text) {
