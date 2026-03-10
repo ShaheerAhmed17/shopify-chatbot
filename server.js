@@ -73,6 +73,32 @@ app.post('/order_status', async (req, res) => {
     }
 });
 
+// --- /products endpoint ---
+app.get('/products', async (req, res) => {
+    try {
+        const response = await axios.get(
+            `https://${SHOPIFY_STORE}/admin/api/2026-01/products.json`,
+            {
+                headers: { 'X-Shopify-Access-Token': ADMIN_TOKEN },
+                params: { limit: 50, status: 'active' }
+            }
+        );
+
+        const products = response.data.products.map(p => ({
+            title: p.title,
+            type: p.product_type || 'Product',
+            vendor: p.vendor,
+            price: p.variants[0]?.price || 'N/A',
+            tags: p.tags
+        }));
+
+        res.json({ products });
+    } catch (err) {
+        console.error("Shopify /products error:", err.response?.data || err.message);
+        res.status(500).json({ error: 'Failed to fetch products' });
+    }
+});
+
 // --- /return_policy endpoint ---
 app.post('/return_policy', (req, res) => {
     const { order_status, used } = req.body;
