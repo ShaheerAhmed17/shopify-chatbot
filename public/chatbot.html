@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Shopify Support Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        #chat-container {
+            width: 350px;
+            height: 500px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        #messages {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            background: #f9f9f9;
+        }
+
+        .message {
+            margin: 5px 0;
+        }
+
+        .user {
+            text-align: right;
+            color: white;
+            background: #0070f3;
+            padding: 5px 10px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        .bot {
+            text-align: left;
+            background: #e5e5ea;
+            padding: 5px 10px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        #input-container {
+            display: flex;
+            border-top: 1px solid #ccc;
+        }
+
+        #input-container input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            outline: none;
+        }
+
+        #input-container button {
+            padding: 10px 15px;
+            border: none;
+            background: #0070f3;
+            color: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="chat-container">
+        <div id="messages"></div>
+        <div id="input-container">
+            <input type="text" id="user-input" placeholder="Ask me anything..." />
+            <button id="send-btn">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const messagesEl = document.getElementById('messages');
+        const inputEl = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+
+        function addMessage(text, sender) {
+            const msg = document.createElement('div');
+            msg.className = `message ${sender}`;
+            msg.textContent = text;
+            messagesEl.appendChild(msg);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const message = inputEl.value.trim();
+            if (!message) return;
+            addMessage(message, 'user');
+            inputEl.value = '';
+
+            try {
+                const res = await fetch('http://localhost:4000/ask', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
+                const data = await res.json();
+                addMessage(data.answer || 'Sorry, something went wrong.', 'bot');
+            } catch (err) {
+                console.error(err);
+                addMessage('Failed to reach backend.', 'bot');
+            }
+        }
+
+        sendBtn.addEventListener('click', sendMessage);
+        inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
+    </script>
+
+</body>
+
+</html>
