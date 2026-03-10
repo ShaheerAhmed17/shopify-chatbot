@@ -10,7 +10,6 @@ app = FastAPI()
 
 HF_API_KEY = os.getenv("HF_API_KEY")
 
-# Correct HF router URL — /v1 base, model+provider in the request body
 HF_API_URL = "https://router.huggingface.co/v1/chat/completions"
 
 HEADERS = {
@@ -18,7 +17,6 @@ HEADERS = {
     "Content-Type": "application/json"
 }
 
-# Edit this to match your actual store details
 SYSTEM_PROMPT = """You are a helpful customer support assistant for an online store that sells luxury cars and automotive products.
 
 Store details:
@@ -27,7 +25,14 @@ Store details:
 - We accept returns on fulfilled, unused orders
 - For order tracking, customers must provide their order number (e.g. #1001)
 
-Be friendly, concise, and helpful. 
+Formatting rules:
+- When listing products, always put each one on a separate line
+- Use this format for products: "• Product Name — $Price"
+- Keep responses short and to the point
+- Do not write long paragraphs
+- Do not add unnecessary filler sentences
+
+Be friendly, concise, and helpful.
 Do NOT make up order details — those are handled separately by our order system.
 Answer general questions about the store, products, and policies naturally."""
 
@@ -37,13 +42,13 @@ class ChatRequest(BaseModel):
 @app.post("/chat")
 def chat(req: ChatRequest):
     payload = {
-        "model": "meta-llama/Llama-3.1-8B-Instruct:cerebras",  # free + fast via Cerebras provider
+        "model": "meta-llama/Llama-3.1-8B-Instruct:cerebras",
         "messages": [
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": req.message}
         ],
-        "max_tokens": 300,
-        "temperature": 0.5
+        "max_tokens": 400,
+        "temperature": 0.4
     }
 
     response = requests.post(HF_API_URL, headers=HEADERS, json=payload)
@@ -61,7 +66,6 @@ def chat(req: ChatRequest):
         print(f"Unexpected HF response format: {data}")
         return {"response": "I'm sorry, something went wrong. Please try again."}
 
-# --- Health check ---
 @app.get("/health")
 def health():
     return {"status": "HF-powered AI backend running"}
