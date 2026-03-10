@@ -3,7 +3,9 @@ const axios = require('axios');
 const bodyParser = require('body-parser');
 const path = require('path');
 
+const cors = require('cors');
 const app = express();
+app.use(cors());
 app.use(bodyParser.json());
 
 // --- Serve static frontend files ---
