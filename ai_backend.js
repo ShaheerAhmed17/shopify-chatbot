@@ -156,6 +156,7 @@ User question: "${message}"
 });
 
 // --- Start AI server ---
-app.listen(4000, () => {
-    console.log('AI backend (phi3) running on http://localhost:4000');
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {
+    console.log(`AI backend running on port ${PORT}`);
 });
