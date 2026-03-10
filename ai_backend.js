@@ -48,7 +48,6 @@ function autoSelectTool(message) {
     return null; // fallback to Phi3 for general queries
 }
 
-// --- /ask endpoint ---
 app.post('/ask', async (req, res) => {
     const { message } = req.body;
     if (!message) return res.status(400).json({ error: "Message is required" });
